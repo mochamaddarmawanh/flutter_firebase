@@ -46,8 +46,11 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     FirebaseAuth.instance.signOut();
                   },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(Colors.blue),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: Text(
                     'SIGN OUT',

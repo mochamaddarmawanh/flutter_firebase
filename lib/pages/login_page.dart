@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'forgot_password.dart';
+
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
@@ -141,6 +143,48 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
+                SizedBox(height: 10),
+
+                // Not a member? register now
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Forgotten password?',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return ForgotPasswordPage();
+                              },
+                            ),
+                          );
+                        },
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: Text(
+                            ' reset here',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 SizedBox(height: 15),
 
                 // Sign in button
@@ -190,8 +234,8 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       'Not a member?',
                       style: TextStyle(
-                        color: Colors.white60,
-                        fontSize: 12,
+                        color: Colors.white,
+                        fontSize: 15,
                       ),
                     ),
                     GestureDetector(
@@ -203,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 15,
                           ),
                         ),
                       ),
