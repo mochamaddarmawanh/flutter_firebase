@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,14 +6,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final VoidCallback showRegisterPage;
+
+  const LoginPage({super.key, required this.showRegisterPage});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   // Textfield controller
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -49,28 +50,31 @@ class _LoginPageState extends State<LoginPage> {
                   size: 75,
                   color: Colors.white,
                 ),
-            
+
                 SizedBox(height: 75),
-            
+
                 // Greating
                 Text(
                   'Hello, mate 👋',
                   style: GoogleFonts.bebasNeue(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 50,
+                    fontSize: 25,
                   ),
                 ),
-            
+
                 SizedBox(height: 5),
-            
+
                 Text(
                   'Welcome back, you\'ve been missed!',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
                 ),
-            
+
                 SizedBox(height: 50),
-            
+
                 // Email Textfield
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -102,9 +106,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 10),
-            
+
                 // Password textfield
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -136,9 +140,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 15),
-            
+
                 // Sign in button
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25),
@@ -176,24 +180,31 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 25),
-            
+
                 // Not a member? register now
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'Not a member?',
-                      style: TextStyle(color: Colors.white60),
+                      style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 12,
+                      ),
                     ),
-                    MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Text(
-                        ' register now',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
+                    GestureDetector(
+                      onTap: widget.showRegisterPage,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: Text(
+                          ' register now',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
