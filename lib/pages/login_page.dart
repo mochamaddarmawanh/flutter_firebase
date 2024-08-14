@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'forgot_password.dart';
 import '../my_dialog.dart';
 
-
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
 
@@ -24,14 +23,40 @@ class _LoginPageState extends State<LoginPage> {
 
   // On tap sign in
   Future signIn() async {
+    showDialog(
+      context: context,
+      // barrierDismissible: false, // Prevents the user from closing the dialog by tapping outside
+      builder: (context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      Navigator.of(context).pop();
+
     } on FirebaseAuthException catch (e) {
-        print(e.message);
-        my_dialog(context: context, error: true, message: e.message.toString());
+
+      Navigator.of(context).pop();
+
+      my_dialog(
+        context: context,
+        error: true,
+        message: e.message.toString(),
+      );
+    } catch (e) {
+
+      Navigator.of(context).pop();
+
+      my_dialog(
+        context: context,
+        error: true,
+        message: e.toString(),
+      );
     }
   }
 

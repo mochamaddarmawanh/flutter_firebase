@@ -23,12 +23,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   // On tap sign in
   Future passwordReset() async {
+    showDialog(context: context, builder: (builder) {
+      return Center(child: CircularProgressIndicator());
+    });
+
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: _emailController.text.trim(),
       );
+      Navigator.of(context).pop();
       my_dialog(context: context, error: false, message: 'Password reset link sent! Check your email.');
     } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pop();
       my_dialog(context: context, error: true, message: e.message.toString());
     }
   }

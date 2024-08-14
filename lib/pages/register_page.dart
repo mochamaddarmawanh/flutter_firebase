@@ -38,7 +38,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // On tap sign in
   Future signUp() async {
+    showDialog(context: context, builder: (builder) {
+      return Center(child: CircularProgressIndicator());
+    });
+    
     if (_firstNameController.text.trim().isEmpty || _lastNameController.text.trim().isEmpty || _ageController.text.trim().isEmpty) {
+      Navigator.of(context).pop();
       my_dialog(context: context, error: true, message: 'First name, last name and age are required!');
       return;
     }
@@ -58,14 +63,17 @@ class _RegisterPageState extends State<RegisterPage> {
           int.parse(_ageController.text.trim()),
         );
 
+        Navigator.of(context).pop();
         my_dialog(context: context, error: false, message: 'User added to system successfully!');
 
       } on FirebaseAuthException catch (e) {
         print('Failed to sign up: ${e.message}');
+        Navigator.of(context).pop();
         my_dialog(context: context, error: true, message: e.message.toString());
       }
     } else {
       print('Passwords do not match');
+      Navigator.of(context).pop();
       my_dialog(context: context, error: true, message: 'Passwords do not match!');
     }
   }

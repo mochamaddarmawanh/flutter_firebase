@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   List<String> docIDs = [];
 
   Future getDocIDs() async {
-    await FirebaseFirestore.instance.collection('users').get().then((snapshot) => snapshot.docs.forEach((document) {
+    await FirebaseFirestore.instance.collection('users').orderBy('age', descending: true).get().then((snapshot) => snapshot.docs.forEach((document) {
       docIDs.add(document.reference.id);
     }));
   }
@@ -46,7 +46,11 @@ class _HomePageState extends State<HomePage> {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () {
+                  showDialog(context: context, builder: (builder) {
+                    return Center(child: CircularProgressIndicator());
+                  });
                   FirebaseAuth.instance.signOut();
+                  Navigator.of(context).pop();
                 },
                 child: Icon(Icons.logout),
               ),
@@ -75,7 +79,11 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
+                showDialog(context: context, builder: (builder) {
+                  return Center(child: CircularProgressIndicator());
+                });
                 FirebaseAuth.instance.signOut();
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
