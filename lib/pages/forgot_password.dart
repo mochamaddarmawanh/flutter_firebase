@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../my_dialog.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -26,58 +27,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: _emailController.text.trim(),
       );
-      passwordResetDialog(error: false, message: 'Password reset link sent! Check your email.');
+      my_dialog(context: context, error: false, message: 'Password reset link sent! Check your email.');
     } on FirebaseAuthException catch (e) {
-      passwordResetDialog(error: true, message: e.message.toString());
+      my_dialog(context: context, error: true, message: e.message.toString());
     }
-  }
-
-  void passwordResetDialog({required bool error, required String message}) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            error ? 'Error' : 'Success',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: error ? Colors.redAccent : Colors.greenAccent,
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  message,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'OK',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          backgroundColor: Colors.white,
-        );
-      },
-    );
   }
 
   @override
@@ -85,7 +38,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Scaffold(
       backgroundColor: Colors.black87,
       appBar: AppBar(
-        backgroundColor: Colors.black54,
+        backgroundColor: Colors.black,
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
@@ -124,7 +77,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.black54,
+                          color: Colors.black,
                           borderRadius: BorderRadius.circular(10),
                           // boxShadow: [
                           //   BoxShadow(

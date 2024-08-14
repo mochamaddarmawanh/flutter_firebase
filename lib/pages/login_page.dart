@@ -1,10 +1,11 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'forgot_password.dart';
+import '../my_dialog.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -23,10 +24,15 @@ class _LoginPageState extends State<LoginPage> {
 
   // On tap sign in
   Future signIn() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } on FirebaseAuthException catch (e) {
+        print(e.message);
+        my_dialog(context: context, error: true, message: e.message.toString());
+    }
   }
 
   @override
@@ -48,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 // icon
                 Icon(
-                  Icons.android,
+                  Icons.account_box,
                   size: 75,
                   color: Colors.white,
                 ),
@@ -82,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black54,
+                      color: Colors.black,
                       borderRadius: BorderRadius.circular(10),
                       // boxShadow: [
                       //   BoxShadow(
@@ -116,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black54,
+                      color: Colors.black,
                       borderRadius: BorderRadius.circular(10),
                       // boxShadow: [
                       //   BoxShadow(

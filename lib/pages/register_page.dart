@@ -1,8 +1,11 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, avoid_print, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
+import '../my_dialog.dart';
 
 class RegisterPage extends StatefulWidget {
   final VoidCallback showLoginPage;
@@ -18,30 +21,72 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-
-  // On tap sign in
-  Future signUp() async {
-    if (passwordConfirmed()) {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-    }
-  }
-
-  bool passwordConfirmed() {
-    if (_passwordController.text.trim() == _passwordController.text.trim()) {
-      return true;
-    }
-
-    return false;
-  }
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _ageController = TextEditingController();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _ageController.dispose();
     super.dispose();
+  }
+
+  // On tap sign in
+  Future signUp() async {
+    if (_firstNameController.text.trim().isEmpty || _lastNameController.text.trim().isEmpty || _ageController.text.trim().isEmpty) {
+      my_dialog(context: context, error: true, message: 'First name, last name and age are required!');
+      return;
+    }
+
+    if (passwordConfirmed()) {
+      try {
+
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        addUserDetails(
+          _emailController.text.trim(),
+          _firstNameController.text.trim(),
+          _lastNameController.text.trim(),
+          int.parse(_ageController.text.trim()),
+        );
+
+        my_dialog(context: context, error: false, message: 'User added to system successfully!');
+
+      } on FirebaseAuthException catch (e) {
+        print('Failed to sign up: ${e.message}');
+        my_dialog(context: context, error: true, message: e.message.toString());
+      }
+    } else {
+      print('Passwords do not match');
+      my_dialog(context: context, error: true, message: 'Passwords do not match!');
+    }
+  }
+
+  Future addUserDetails(String email, String firstName, String lastName, int age) async {
+    try {
+      await FirebaseFirestore.instance.collection('users').add({
+        'email': email,
+        'firstName': firstName,
+        'lastName': lastName,
+        'age': age,
+      });
+      print('User details added to Firestore.');
+    } catch (e) {
+      print('Failed to add user details: $e');
+      my_dialog(context: context, error: true, message: e.toString());
+    }
+  }
+
+  bool passwordConfirmed() {
+    return _passwordController.text.trim() == _confirmPasswordController.text.trim();
   }
 
   @override
@@ -54,16 +99,7 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // icon
-                Icon(
-                  Icons.android,
-                  size: 75,
-                  color: Colors.white,
-                ),
-
-                SizedBox(height: 75),
-
-                // Greating
+                // Greeting
                 Text(
                   'Register now, mate 🤙',
                   style: GoogleFonts.bebasNeue(
@@ -72,9 +108,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     fontSize: 25,
                   ),
                 ),
-
                 SizedBox(height: 5),
-
                 Text(
                   'Register below with your details!',
                   style: TextStyle(
@@ -85,109 +119,60 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 SizedBox(height: 50),
 
-                // Email Textfield
+                // First Name Textfield
+                _buildTextField(_firstNameController, 'First Name', autofocus: true),
+
+                SizedBox(height: 10),
+
+                // Last Name Textfield
+                _buildTextField(_lastNameController, 'Last Name'),
+
+                SizedBox(height: 10),
+
+                // Age Textfield
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black54,
+                      color: Colors.black,
                       borderRadius: BorderRadius.circular(10),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.black.withOpacity(0.5),
-                      //     spreadRadius: 2,
-                      //     blurRadius: 7,
-                      //     offset: Offset(0, 3),
-                      //   ),
-                      // ],
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: TextField(
-                        autofocus: true,
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          // border: InputBorder.none,
-                          hintText: 'Email',
+                          hintText: 'Age',
                           hintStyle: TextStyle(color: Colors.white60),
                         ),
-                        controller: _emailController,
+                        controller: _ageController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                       ),
                     ),
                   ),
                 ),
+
+                SizedBox(height: 10),
+
+                // Email Textfield
+                _buildTextField(_emailController, 'Email'),
 
                 SizedBox(height: 10),
 
                 // Password textfield
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(10),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.black.withOpacity(0.5),
-                      //     spreadRadius: 2,
-                      //     blurRadius: 7,
-                      //     offset: Offset(0, 3),
-                      //   ),
-                      // ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: TextField(
-                        obscureText: true,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          // border: InputBorder.none,
-                          hintText: 'Password',
-                          hintStyle: TextStyle(color: Colors.white60),
-                        ),
-                        controller: _passwordController,
-                      ),
-                    ),
-                  ),
-                ),
+                _buildTextField(_passwordController, 'Password', obscureText: true),
 
                 SizedBox(height: 10),
 
                 // Confirm password textfield
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(10),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.black.withOpacity(0.5),
-                      //     spreadRadius: 2,
-                      //     blurRadius: 7,
-                      //     offset: Offset(0, 3),
-                      //   ),
-                      // ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: TextField(
-                        obscureText: true,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          // border: InputBorder.none,
-                          hintText: 'Confirm password',
-                          hintStyle: TextStyle(color: Colors.white60),
-                        ),
-                        controller: _confirmPasswordController,
-                      ),
-                    ),
-                  ),
-                ),
+                _buildTextField(_confirmPasswordController, 'Confirm Password', obscureText: true),
 
                 SizedBox(height: 15),
 
-                // Sign in button
+                // Sign-up button
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25),
                   child: GestureDetector(
@@ -227,15 +212,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 SizedBox(height: 25),
 
-                // Not a member? register now
+                // Already a member? Login
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'I am a member!',
+                      'Already a member?',
                       style: TextStyle(
-                        color: Colors.white60,
-                        fontSize: 12,
+                        color: Colors.white,
+                        fontSize: 15,
                       ),
                     ),
                     GestureDetector(
@@ -243,11 +228,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: Text(
-                          ' login now',
+                          ' login here',
                           style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 15,
                           ),
                         ),
                       ),
@@ -256,6 +241,31 @@ class _RegisterPageState extends State<RegisterPage> {
                 )
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hintText, {bool autofocus = false, bool obscureText = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: TextField(
+            autofocus: autofocus,
+            style: TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: TextStyle(color: Colors.white60),
+            ),
+            controller: controller,
+            obscureText: obscureText,
           ),
         ),
       ),
